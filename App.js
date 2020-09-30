@@ -1,8 +1,7 @@
 import CameraRoll from '@react-native-community/cameraroll';
-
 import React, { useEffect, useState } from 'react';
-
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { PERMISSIONS, request } from 'react-native-permissions';
 
 const { width, height } = Dimensions.get('screen')
 
@@ -12,18 +11,20 @@ export default function App() {
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
-    CameraRoll.getPhotos({
-      first: 20,
-      assetType: 'Photos',
-    })
-      .then(r => {
-        console.log(r)
-        setSelected(r.edges[0].node.image.uri)
-        setPhotos(r.edges)
+    request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE).then(() => {
+      CameraRoll.getPhotos({
+        first: 20,
+        assetType: 'Photos',
       })
-      .catch((err) => {
-        console.log(err);
-      });
+        .then(r => {
+          console.log(r)
+          setSelected(r.edges[0].node.image.uri)
+          setPhotos(r.edges)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    })
   }, [])
 
   return (
